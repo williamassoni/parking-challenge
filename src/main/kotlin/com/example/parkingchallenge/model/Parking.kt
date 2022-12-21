@@ -36,11 +36,15 @@ class ParkingArea(slots: List<Slot> = arrayListOf(Slot(Size.SMALL, occupied = fa
      *
      * @param size
      */
-    fun markSpotAsOccupied(size: Size) {
-        when(size) {
-            Size.SMALL -> smallAreas.first { !it.occupied }.occupied = true
-            Size.MEDIUM -> mediumAreas.first { !it.occupied }.occupied = true
-            Size.LARGE -> largeAreas.first { !it.occupied }.occupied = true
+    fun markSpotAsOccupied(slot: Slot) {
+        slot.occupied = true
+    }
+
+    fun fetchFreeSpot(size: Size): Slot{
+        return when(size) {
+            Size.SMALL -> smallAreas.first { !it.occupied }
+            Size.MEDIUM -> mediumAreas.first { !it.occupied }
+            Size.LARGE -> largeAreas.first { !it.occupied }
         }
     }
 }
@@ -57,8 +61,8 @@ class ParkingAreaControl(private val parkingArea: ParkingArea=ParkingArea()) {
      * @param car
      */
     fun allocate(car:Car) {
-        val availableSize = determineAvailableSpotSizeForAllocation(car) ?: throw NoAvailableSpot()
-        parkingArea.markSpotAsOccupied(availableSize)
+        val availableSpot = determineAvailableSpotSizeForAllocation(car) ?: throw NoAvailableSpot()
+        parkingArea.markSpotAsOccupied(availableSpot)
     }
 
     /**
@@ -69,14 +73,14 @@ class ParkingAreaControl(private val parkingArea: ParkingArea=ParkingArea()) {
      *
      * @param car
      */
-    private fun determineAvailableSpotSizeForAllocation(car: Car) : Size? {
+    private fun determineAvailableSpotSizeForAllocation(car: Car) : Slot? {
         return when {
-            car.size == Size.SMALL && parkingArea.isAvailable(Size.SMALL) -> Size.SMALL
-            car.size == Size.SMALL && parkingArea.isAvailable(Size.MEDIUM) -> Size.MEDIUM
-            car.size == Size.SMALL && parkingArea.isAvailable(Size.LARGE) -> Size.LARGE
-            car.size == Size.MEDIUM && parkingArea.isAvailable(Size.MEDIUM) -> Size.MEDIUM
-            car.size == Size.MEDIUM && parkingArea.isAvailable(Size.LARGE) -> Size.LARGE
-            car.size == Size.LARGE && parkingArea.isAvailable(Size.LARGE) -> Size.LARGE
+            car.size == Size.SMALL && parkingArea.isAvailable(Size.SMALL) -> parkingArea.fetchFreeSpot(Size.SMALL)
+            car.size == Size.SMALL && parkingArea.isAvailable(Size.MEDIUM) -> parkingArea.fetchFreeSpot(Size.MEDIUM)
+            car.size == Size.SMALL && parkingArea.isAvailable(Size.LARGE) -> parkingArea.fetchFreeSpot(Size.LARGE)
+            car.size == Size.MEDIUM && parkingArea.isAvailable(Size.MEDIUM) -> parkingArea.fetchFreeSpot(Size.MEDIUM)
+            car.size == Size.MEDIUM && parkingArea.isAvailable(Size.LARGE) -> parkingArea.fetchFreeSpot(Size.LARGE)
+            car.size == Size.LARGE && parkingArea.isAvailable(Size.LARGE) -> parkingArea.fetchFreeSpot(Size.LARGE)
             else -> return null
         }
     }
