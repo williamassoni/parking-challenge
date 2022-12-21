@@ -33,8 +33,6 @@ class ParkingArea(slots: List<Slot> = arrayListOf(Slot(Size.SMALL, occupied = fa
 
     /**
      *  Mark a spot from the same size as 'occupied'
-     *
-     * @param size
      */
     fun markSpotAsOccupied(slot: Slot) {
         slot.occupied = true
